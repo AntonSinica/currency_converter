@@ -1,30 +1,17 @@
 import tkinter as tk
 from tkinter import ttk
 import requests
-import time
-from ttkthemes import ThemedTk
-
-# Глобальные переменные для кэширования
-last_update = 0
-cached_rates = None
 
 
 # Функция для получения курсов валют
 def get_rates():
-    global last_update, cached_rates
-
-    if time.time() - last_update < 3600:  # Кэш на 1 час
-        return cached_rates
-
     try:
         response = requests.get("https://www.cbr-xml-daily.ru/daily_json.js", timeout=5)
         response.raise_for_status()
         data = response.json()
         usd_rate = data["Valute"]["USD"]["Value"]
         eur_rate = data["Valute"]["EUR"]["Value"]
-        cached_rates = (usd_rate, eur_rate)
-        last_update = time.time()
-        return cached_rates
+        return usd_rate, eur_rate
     except:
         return None, None
 
@@ -59,8 +46,8 @@ def convert():
         label_result.config(text="Введите число!")
 
 
-# Создание окна с темной темой
-window = ThemedTk(theme="equilux")
+# Создание окна
+window = tk.Tk()
 window.title("Конвертер валют")
 window.geometry("400x400")
 
@@ -88,6 +75,13 @@ label_result.pack()
 # Текстовое поле для истории конвертаций
 history_text = tk.Text(window, height=5, width=40)
 history_text.pack(pady=10)
+
+# Подсказка о горячих клавишах
+label_hint = tk.Label(window, text="Нажмите Enter для конвертации", font=("Arial", 8), fg="gray")
+label_hint.pack(pady=5)
+
+# Привязка клавиши Enter к функции convert()
+window.bind("<Return>", lambda event: convert())
 
 # Запуск главного цикла
 window.mainloop()
