@@ -52,6 +52,14 @@ def clear_fields():
     history_text.delete(1.0, tk.END)  # Очищаем текстовое поле с историей
 
 
+# Функция для скрытия/показа истории
+def toggle_history():
+    if history_text.winfo_viewable():  # Если текстовое поле видимо
+        history_text.pack_forget()  # Скрываем его
+    else:
+        history_text.pack(pady=10)  # Показываем его
+
+
 # Создание окна
 window = tk.Tk()
 window.title("Конвертер валют")
@@ -90,15 +98,19 @@ btn_clear = ttk.Button(window, text="Очистить", command=clear_fields)
 btn_clear.pack(pady=5)
 
 # Подсказка о горячих клавишах
-label_hint = tk.Label(window, text="Нажмите Enter для конвертации, Ctrl + Shift + C для очистки", font=("Arial", 8),
-                      fg="gray")
+label_hint = tk.Label(window,
+                      text="Enter — конвертация, Ctrl + Shift + C — очистка, Ctrl + H — скрыть/показать историю",
+                      font=("Arial", 8), fg="gray")
 label_hint.pack(pady=5)
 
 # Привязка клавиши Enter к функции convert()
 window.bind("<Return>", lambda event: convert())
 
-# Привязка сочетания клавиш Ctrl + Shift + C к функции clear_fields()
-window.bind("<Control-Shift-C>", lambda event: clear_fields())
+# Привязка сочетания клавиш Ctrl + Shift + C (латиница и кириллица)
+window.bind("<Control-Shift-Key-C>", lambda event: clear_fields())  # Физическая клавиша "C"
+
+# Привязка сочетания клавиш Ctrl + H (латиница и кириллица)
+window.bind("<Control-h>", lambda event: toggle_history())  # Физическая клавиша "H"
 
 # Запуск главного цикла
 window.mainloop()
