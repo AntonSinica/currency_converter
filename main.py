@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import ttk
 import requests
 
-
 # Функция для получения курсов валют
 def get_rates():
     try:
@@ -15,42 +14,34 @@ def get_rates():
     except:
         return None, None
 
-
 # Функция для конвертации рублей в выбранную валюту
 def convert():
     currency = selected_currency.get()
     usd_rate, eur_rate = get_rates()
-
     if usd_rate is None:
         label_result.config(text="Нет данных с сервера!")
         return
-
     try:
         rub = float(entry_rub.get())
-
         if currency == "USD":
             rate = usd_rate
         elif currency == "EUR":
             rate = eur_rate
         elif currency == "CNY":
             rate = eur_rate / 7.5  # Примерный курс юаня
-
         result = rub / rate
         result_text = f"{result:.2f} {currency}"
         label_result.config(text=result_text)
-
         # Добавляем запись в историю
         history_text.insert(tk.END, f"{rub} RUB → {result_text}\n")
         history_text.see(tk.END)
     except ValueError:
         label_result.config(text="Введите число!")
 
-
 # Функция для очистки полей
 def clear_fields():
     entry_rub.delete(0, tk.END)  # Очищаем поле ввода
     history_text.delete(1.0, tk.END)  # Очищаем текстовое поле с историей
-
 
 # Функция для скрытия/показа истории
 def toggle_history():
@@ -58,7 +49,6 @@ def toggle_history():
         history_text.pack_forget()  # Скрываем его
     else:
         history_text.pack(pady=10)  # Показываем его
-
 
 # Создание окна
 window = tk.Tk()
@@ -89,19 +79,23 @@ btn_convert.pack(pady=10)
 label_result = tk.Label(window, text="Результат:")
 label_result.pack()
 
-# Текстовое поле для истории конвертаций
-history_text = tk.Text(window, height=5, width=40)
-history_text.pack(pady=10)
-
 # Кнопка "Очистить"
 btn_clear = ttk.Button(window, text="Очистить", command=clear_fields)
 btn_clear.pack(pady=5)
 
-# Подсказка о горячих клавишах
-label_hint = tk.Label(window,
-                      text="Enter — конвертация, Ctrl + Shift + C — очистка, Ctrl + H — скрыть/показать историю",
-                      font=("Arial", 8), fg="gray")
+# Подсказка о горячих клавишах (разделенная на несколько строк)
+label_hint = tk.Label(
+    window,
+    text="Enter — конвертация\n"
+         "Ctrl + Shift + C — очистка\n"
+         "Ctrl + H — скрыть/показать историю",
+    font=("Arial", 8), fg="gray"
+)
 label_hint.pack(pady=5)
+
+# Текстовое поле для истории конвертаций (сразу после подсказки)
+history_text = tk.Text(window, height=5, width=40)
+history_text.pack(pady=10)
 
 # Привязка клавиши Enter к функции convert()
 window.bind("<Return>", lambda event: convert())
