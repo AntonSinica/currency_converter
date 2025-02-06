@@ -5,11 +5,16 @@ import requests
 
 # Класс для работы с API ЦБ РФ
 class APIHandler:
-    def __init__(self):
-        self.url = "https://www.cbr-xml-daily.ru/daily_json.js"
-        self.timeout = 5
+    def __init__(self) -> None:
+        """Инициализирует URL и таймаут для запросов к API ЦБ РФ."""
+        self.url: str = "https://www.cbr-xml-daily.ru/daily_json.js"
+        self.timeout: int = 5
 
-    def get_rates(self):
+    def get_rates(self) -> tuple[float | None, float | None]:
+        """
+        Получает курсы валют USD и EUR через API ЦБ РФ.
+        Возвращает кортеж с курсами (usd_rate, eur_rate) или (None, None) в случае ошибки.
+        """
         try:
             response = requests.get(self.url, timeout=self.timeout)
             response.raise_for_status()
@@ -23,23 +28,39 @@ class APIHandler:
 
 # Класс для управления историей конвертаций
 class HistoryManager:
-    def __init__(self, text_widget):
-        self.text_widget = text_widget
+    def __init__(self, text_widget: tk.Text) -> None:
+        """
+        Инициализирует менеджер истории с текстовым виджетом для отображения записей.
+        """
+        self.text_widget: tk.Text = text_widget
 
-    def add_record(self, rub, result_text):
+    def add_record(self, rub: float, result_text: str) -> None:
+        """
+        Добавляет запись о конвертации в текстовое поле истории.
+        """
         self.text_widget.insert(tk.END, f"{rub} RUB → {result_text}\n")
         self.text_widget.see(tk.END)
 
-    def clear_history(self):
+    def clear_history(self) -> None:
+        """
+        Очищает текстовое поле с историей конвертаций.
+        """
         self.text_widget.delete(1.0, tk.END)
 
 
 # Класс для логики конвертации валют
 class CurrencyConverter:
-    def __init__(self, api_handler):
-        self.api_handler = api_handler
+    def __init__(self, api_handler: APIHandler) -> None:
+        """
+        Инициализирует конвертер валют с объектом APIHandler для получения курсов.
+        """
+        self.api_handler: APIHandler = api_handler
 
-    def convert(self, rub, currency):
+    def convert(self, rub: float, currency: str) -> str | None:
+        """
+        Конвертирует сумму в рублях в выбранную валюту.
+        Возвращает строку с результатом или None в случае ошибки.
+        """
         usd_rate, eur_rate = self.api_handler.get_rates()
         if usd_rate is None or eur_rate is None:
             return None
@@ -59,20 +80,26 @@ class CurrencyConverter:
 
 # Класс для графического интерфейса
 class GUI:
-    def __init__(self, root, converter):
-        self.root = root
-        self.converter = converter
+    def __init__(self, root: tk.Tk, converter: CurrencyConverter) -> None:
+        """
+        Инициализирует графический интерфейс приложения.
+        """
+        self.root: tk.Tk = root
+        self.converter: CurrencyConverter = converter
 
         self.root.title("Конвертер валют")
         self.root.geometry("400x400")
 
         # Создаем текстовое поле для истории
-        self.history_text = tk.Text(self.root, height=5, width=40)
-        self.history_manager = HistoryManager(self.history_text)
+        self.history_text: tk.Text = tk.Text(self.root, height=5, width=40)
+        self.history_manager: HistoryManager = HistoryManager(self.history_text)
 
         self.create_widgets()
 
-    def create_widgets(self):
+    def create_widgets(self) -> None:
+        """
+        Создает и размещает все виджеты интерфейса.
+        """
         # Поле для ввода рублей
         label_rub = tk.Label(self.root, text="Рубли:")
         label_rub.pack()
@@ -119,7 +146,10 @@ class GUI:
         self.root.bind("<Control-Shift-Key-C>", lambda event: self.clear_fields())
         self.root.bind("<Control-h>", lambda event: self.toggle_history())
 
-    def perform_conversion(self):
+    def perform_conversion(self) -> None:
+        """
+        Выполняет конвертацию валюты и обновляет интерфейс.
+        """
         try:
             rub = float(self.entry_rub.get())
             currency = self.selected_currency.get()
@@ -132,11 +162,17 @@ class GUI:
         except ValueError:
             self.label_result.config(text="Введите число!")
 
-    def clear_fields(self):
+    def clear_fields(self) -> None:
+        """
+        Очищает поле ввода и текстовое поле с историей.
+        """
         self.entry_rub.delete(0, tk.END)
         self.history_manager.clear_history()
 
-    def toggle_history(self):
+    def toggle_history(self) -> None:
+        """
+        Скрывает или показывает текстовое поле с историей конвертаций.
+        """
         if self.history_text.winfo_viewable():
             self.history_text.pack_forget()
         else:
