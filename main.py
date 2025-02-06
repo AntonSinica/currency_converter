@@ -46,6 +46,12 @@ def convert():
         label_result.config(text="Введите число!")
 
 
+# Функция для очистки полей
+def clear_fields():
+    entry_rub.delete(0, tk.END)  # Очищаем поле ввода
+    history_text.delete(1.0, tk.END)  # Очищаем текстовое поле с историей
+
+
 # Создание окна
 window = tk.Tk()
 window.title("Конвертер валют")
@@ -56,6 +62,9 @@ label_rub = tk.Label(window, text="Рубли:")
 label_rub.pack()
 entry_rub = tk.Entry(window)
 entry_rub.pack()
+
+# Установка фокуса на поле ввода
+entry_rub.focus()
 
 # Выпадающий список для выбора валюты
 currencies = ["USD", "EUR", "CNY"]
@@ -76,12 +85,20 @@ label_result.pack()
 history_text = tk.Text(window, height=5, width=40)
 history_text.pack(pady=10)
 
+# Кнопка "Очистить"
+btn_clear = ttk.Button(window, text="Очистить", command=clear_fields)
+btn_clear.pack(pady=5)
+
 # Подсказка о горячих клавишах
-label_hint = tk.Label(window, text="Нажмите Enter для конвертации", font=("Arial", 8), fg="gray")
+label_hint = tk.Label(window, text="Нажмите Enter для конвертации, Ctrl + Shift + C для очистки", font=("Arial", 8),
+                      fg="gray")
 label_hint.pack(pady=5)
 
 # Привязка клавиши Enter к функции convert()
 window.bind("<Return>", lambda event: convert())
+
+# Привязка сочетания клавиш Ctrl + Shift + C к функции clear_fields()
+window.bind("<Control-Shift-C>", lambda event: clear_fields())
 
 # Запуск главного цикла
 window.mainloop()
